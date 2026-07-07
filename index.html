@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Animated Birthday Experience</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Main Container -->
+    <div id="app-container">
+        
+        <!-- Step 1: QR Code Entry View -->
+        <section id="view-qr" class="view active">
+            <div class="glass-card scanner-card">
+                <div class="scanner-header">
+                    <i class="fa-solid fa-shield-heart pulse-pink"></i>
+                    <h2>SECURE DECRYPTION KEY</h2>
+                    <p>Scan the verification QR code to initiate the system sequence.</p>
+                </div>
+                
+                <div class="scanner-box">
+                    <div id="qr-reader"></div>
+                    <div class="scanner-laser"></div>
+                    <div class="scanner-overlay">
+                        <i class="fa-solid fa-qrcode scanner-icon"></i>
+                        <p>Awaiting QR Code...</p>
+                    </div>
+                </div>
+                
+                <div class="scanner-actions">
+                    <button id="btn-start-camera" class="btn btn-primary">
+                        <i class="fa-solid fa-camera"></i> Use Camera
+                    </button>
+                    <div class="file-upload-wrapper">
+                        <label for="qr-file-input" class="btn btn-secondary">
+                            <i class="fa-solid fa-upload"></i> Upload QR Image
+                        </label>
+                        <input type="file" id="qr-file-input" accept="image/*">
+                    </div>
+                    <button id="btn-simulate-scan" class="btn btn-accent">
+                        <i class="fa-solid fa-bolt"></i> Bypass / Demo scan
+                    </button>
+                </div>
+                
+                <div class="scanner-footer">
+                    <p>Designed for Samsung Galaxy Tab &amp; iPhone Fallback</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2: Pink Matrix Fall View -->
+        <section id="view-matrix" class="view">
+            <canvas id="matrix-canvas"></canvas>
+            <div class="matrix-overlay">
+                <div class="glitch-text" id="matrix-status" data-text="INITIALIZING SYSTEM DECRYPTION...">INITIALIZING SYSTEM DECRYPTION...</div>
+                <div class="matrix-sub-status" id="matrix-sub-status">ESTABLISHING SECURE PROTOCOLS...</div>
+                <div class="matrix-progress-bar">
+                    <div class="matrix-progress-fill" id="matrix-progress"></div>
+                </div>
+                <div class="matrix-terminal-logs" id="matrix-terminal-logs">
+                    <!-- Log lines will insert dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 3: Midnight Countdown View -->
+        <section id="view-countdown" class="view">
+            <div class="particles" id="countdown-particles"></div>
+            <div class="glass-card countdown-card">
+                <span class="countdown-badge">Target Event: May 3rd Midnight</span>
+                <h1 class="glow-text">THE MIDNIGHT THRESHOLD</h1>
+                
+                <div class="timer-display">
+                    <div class="timer-segment">
+                        <span class="timer-num" id="time-days">00</span>
+                        <span class="timer-label">DAYS</span>
+                    </div>
+                    <span class="timer-colon">:</span>
+                    <div class="timer-segment">
+                        <span class="timer-num" id="time-hours">00</span>
+                        <span class="timer-label">HOURS</span>
+                    </div>
+                    <span class="timer-colon">:</span>
+                    <div class="timer-segment">
+                        <span class="timer-num" id="time-mins">00</span>
+                        <span class="timer-label">MINUTES</span>
+                    </div>
+                    <span class="timer-colon">:</span>
+                    <div class="timer-segment">
+                        <span class="timer-num" id="time-secs">00</span>
+                        <span class="timer-label">SECONDS</span>
+                    </div>
+                </div>
+                
+                <div class="countdown-footer-msg">
+                    <i class="fa-solid fa-lock-open pulsing-icon"></i>
+                    <span id="countdown-status-text">Synchronizing clock with server...</span>
+                </div>
+            </div>
+
+            <!-- Fullscreen Dramatic Final 10 Sec Countdown Overlay -->
+            <div id="final-countdown-overlay" class="final-countdown-overlay">
+                <div class="countdown-big-num" id="countdown-big-num">10</div>
+                <div class="countdown-big-pulse"></div>
+            </div>
+        </section>
+
+        <!-- Step 4: Interactive Birthday Cake View -->
+        <section id="view-cake" class="view">
+            <div class="glass-card cake-card">
+                <h1 class="glow-text text-center">A Special Birthday Delight 🎂</h1>
+                <p class="cake-instruction text-center" id="cake-instruction">Wait! A delicious cake is loading...</p>
+                
+                <div class="cake-container">
+                    <!-- Custom SVG Cake -->
+                    <svg id="svg-cake" viewBox="0 0 400 450" width="100%" height="100%">
+                        <!-- Shadow -->
+                        <ellipse cx="200" cy="380" rx="140" ry="25" fill="rgba(0,0,0,0.4)" />
+                        
+                        <!-- Stand/Plate -->
+                        <path d="M 70 370 L 330 370 L 320 390 L 80 390 Z" fill="hsl(250, 10%, 80%)" />
+                        <path d="M 80 390 L 320 390 L 310 400 L 90 400 Z" fill="hsl(250, 10%, 70%)" />
+                        <rect x="170" y="400" width="60" height="20" fill="hsl(250, 10%, 65%)" />
+                        <ellipse cx="200" cy="420" rx="50" ry="10" fill="hsl(250, 10%, 55%)" />
+
+                        <!-- Cake Base Layer -->
+                        <path d="M 90 360 C 90 330, 310 330, 310 360 L 310 370 C 310 370, 90 370, 90 370 Z" fill="hsl(335, 80%, 25%)" /> <!-- Bottom crust -->
+                        <rect x="90" y="270" width="220" height="90" fill="hsl(335, 75%, 35%)" /> <!-- Cake layer body -->
+                        <path d="M 90 270 Q 200 290 310 270 L 310 360 Q 200 380 90 360 Z" fill="hsl(335, 75%, 42%)" /> <!-- Top surface curvature of base layer -->
+                        
+                        <!-- Frosting / Drips -->
+                        <path d="M 90 270 Q 200 290 310 270 
+                                 C 310 290, 290 300, 280 285
+                                 C 270 305, 250 310, 240 290
+                                 C 230 310, 210 315, 200 295
+                                 C 190 310, 170 315, 160 290
+                                 C 150 310, 130 310, 120 285
+                                 C 110 300, 90 290, 90 270 Z" fill="hsl(335, 95%, 75%)" />
+
+                        <!-- Sparkles / Sprinkles on cake -->
+                        <circle cx="120" cy="320" r="4" fill="hsl(50, 100%, 70%)" />
+                        <circle cx="160" cy="340" r="4" fill="hsl(180, 100%, 75%)" />
+                        <circle cx="210" cy="310" r="4" fill="hsl(280, 100%, 75%)" />
+                        <circle cx="250" cy="335" r="4" fill="hsl(120, 100%, 70%)" />
+                        <circle cx="280" cy="315" r="4" fill="hsl(10, 100%, 70%)" />
+
+                        <!-- Middle Frosting Swirl Line -->
+                        <path d="M 90 315 Q 200 330 310 315" stroke="hsl(335, 95%, 75%)" stroke-width="8" fill="none" stroke-linecap="round" />
+
+                        <!-- Cream Dollops on Top -->
+                        <g id="cream-dollops" opacity="0" class="cake-part">
+                            <path d="M 120 270 C 110 250, 130 250, 120 270 Z" fill="#ffffff" />
+                            <ellipse cx="120" cy="270" rx="10" ry="5" fill="#ffffff" />
+                            
+                            <path d="M 160 275 C 150 255, 170 255, 160 275 Z" fill="#ffffff" />
+                            <ellipse cx="160" cy="275" rx="10" ry="5" fill="#ffffff" />
+
+                            <path d="M 200 278 C 190 258, 210 258, 200 278 Z" fill="#ffffff" />
+                            <ellipse cx="200" cy="278" rx="10" ry="5" fill="#ffffff" />
+
+                            <path d="M 240 275 C 230 255, 250 255, 240 275 Z" fill="#ffffff" />
+                            <ellipse cx="240" cy="275" rx="10" ry="5" fill="#ffffff" />
+
+                            <path d="M 280 270 C 270 250, 290 250, 280 270 Z" fill="#ffffff" />
+                            <ellipse cx="280" cy="270" rx="10" ry="5" fill="#ffffff" />
+                        </g>
+
+                        <!-- Candles (Starts invisible, drops down) -->
+                        <g id="candles-group" class="cake-part" opacity="0">
+                            <!-- Candle 1 -->
+                            <g transform="translate(120, 205)">
+                                <rect x="-6" y="0" width="12" height="60" rx="4" fill="url(#candle-grad-1)" />
+                                <!-- Wick -->
+                                <line x1="0" y1="0" x2="0" y2="-10" stroke="#555" stroke-width="2" />
+                                <!-- Flame -->
+                                <path id="flame-1" class="candle-flame" d="M 0 -10 C -8 -22, -4 -35, 0 -45 C 4 -35, 8 -22, 0 -10 Z" fill="url(#flame-grad)" opacity="0" />
+                                <circle id="glow-1" class="flame-glow" cx="0" cy="-25" r="15" fill="rgba(255,140,0,0.3)" filter="blur(5px)" opacity="0" />
+                            </g>
+                            
+                            <!-- Candle 2 -->
+                            <g transform="translate(160, 210)">
+                                <rect x="-6" y="0" width="12" height="60" rx="4" fill="url(#candle-grad-2)" />
+                                <line x1="0" y1="0" x2="0" y2="-10" stroke="#555" stroke-width="2" />
+                                <path id="flame-2" class="candle-flame" d="M 0 -10 C -8 -22, -4 -35, 0 -45 C 4 -35, 8 -22, 0 -10 Z" fill="url(#flame-grad)" opacity="0" />
+                                <circle id="glow-2" class="flame-glow" cx="0" cy="-25" r="15" fill="rgba(255,140,0,0.3)" filter="blur(5px)" opacity="0" />
+                            </g>
+
+                            <!-- Candle 3 (Center) -->
+                            <g transform="translate(200, 213)">
+                                <rect x="-6" y="0" width="12" height="60" rx="4" fill="url(#candle-grad-3)" />
+                                <line x1="0" y1="0" x2="0" y2="-10" stroke="#555" stroke-width="2" />
+                                <path id="flame-3" class="candle-flame" d="M 0 -10 C -8 -22, -4 -35, 0 -45 C 4 -35, 8 -22, 0 -10 Z" fill="url(#flame-grad)" opacity="0" />
+                                <circle id="glow-3" class="flame-glow" cx="0" cy="-25" r="15" fill="rgba(255,140,0,0.3)" filter="blur(5px)" opacity="0" />
+                            </g>
+
+                            <!-- Candle 4 -->
+                            <g transform="translate(240, 210)">
+                                <rect x="-6" y="0" width="12" height="60" rx="4" fill="url(#candle-grad-1)" />
+                                <line x1="0" y1="0" x2="0" y2="-10" stroke="#555" stroke-width="2" />
+                                <path id="flame-4" class="candle-flame" d="M 0 -10 C -8 -22, -4 -35, 0 -45 C 4 -35, 8 -22, 0 -10 Z" fill="url(#flame-grad)" opacity="0" />
+                                <circle id="glow-4" class="flame-glow" cx="0" cy="-25" r="15" fill="rgba(255,140,0,0.3)" filter="blur(5px)" opacity="0" />
+                            </g>
+
+                            <!-- Candle 5 -->
+                            <g transform="translate(280, 205)">
+                                <rect x="-6" y="0" width="12" height="60" rx="4" fill="url(#candle-grad-2)" />
+                                <line x1="0" y1="0" x2="0" y2="-10" stroke="#555" stroke-width="2" />
+                                <path id="flame-5" class="candle-flame" d="M 0 -10 C -8 -22, -4 -35, 0 -45 C 4 -35, 8 -22, 0 -10 Z" fill="url(#flame-grad)" opacity="0" />
+                                <circle id="glow-5" class="flame-glow" cx="0" cy="-25" r="15" fill="rgba(255,140,0,0.3)" filter="blur(5px)" opacity="0" />
+                            </g>
+                        </g>
+
+                        <!-- Gradients definition -->
+                        <defs>
+                            <linearGradient id="candle-grad-1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="hsl(320, 100%, 75%)" />
+                                <stop offset="50%" stop-color="hsl(320, 100%, 85%)" />
+                                <stop offset="100%" stop-color="hsl(320, 100%, 65%)" />
+                            </linearGradient>
+                            <linearGradient id="candle-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="hsl(190, 100%, 70%)" />
+                                <stop offset="50%" stop-color="hsl(190, 100%, 85%)" />
+                                <stop offset="100%" stop-color="hsl(190, 100%, 60%)" />
+                            </linearGradient>
+                            <linearGradient id="candle-grad-3" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="hsl(45, 100%, 70%)" />
+                                <stop offset="50%" stop-color="hsl(45, 100%, 85%)" />
+                                <stop offset="100%" stop-color="hsl(45, 100%, 60%)" />
+                            </linearGradient>
+                            <linearGradient id="flame-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+                                <stop offset="0%" stop-color="rgba(255, 60, 0, 0.9)" />
+                                <stop offset="50%" stop-color="rgba(255, 160, 0, 0.95)" />
+                                <stop offset="80%" stop-color="rgba(255, 230, 100, 1)" />
+                                <stop offset="100%" stop-color="rgba(255, 255, 255, 1)" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+
+                <div class="cake-controls text-center">
+                    <!-- Stage 1 Button: Place Candles -->
+                    <button id="btn-place-candles" class="btn btn-primary">
+                        <i class="fa-solid fa-cookie"></i> Place Candles
+                    </button>
+                    <!-- Stage 2 Button: Light Candles (E or tap) -->
+                    <button id="btn-light-candles" class="btn btn-accent d-none">
+                        <i class="fa-solid fa-fire"></i> Press [E] or Tap to Light Candles
+                    </button>
+                    
+                    <!-- Stage 3 Controls: Blow out candles -->
+                    <div id="blow-controls" class="d-none">
+                        <div class="mic-meter-wrapper">
+                            <p class="mic-status-label">Blowing force indicator:</p>
+                            <div class="mic-meter">
+                                <div id="mic-meter-fill" class="mic-meter-fill"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button id="btn-mic-enable" class="btn btn-secondary">
+                                <i class="fa-solid fa-microphone"></i> Use Microphone 🎤
+                            </button>
+                            <button id="btn-blow-simulate" class="btn btn-primary">
+                                <i class="fa-solid fa-wind"></i> Blow Out Candles 🌬️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 5: Birthday Wish Message View -->
+        <section id="view-wish" class="view">
+            <div class="wish-particles" id="wish-particles"></div>
+            <div class="glass-card wish-card text-center">
+                <div class="wish-icon-banner">
+                    <i class="fa-solid fa-star-and-crescent pulse-gold"></i>
+                    <i class="fa-solid fa-cake-candles float-animation"></i>
+                    <i class="fa-solid fa-gift pulse-gold"></i>
+                </div>
+                
+                <h1 class="wish-title glow-pink">HAPPY BIRTHDAY! 🌸</h1>
+                
+                <div class="wish-message-body" id="wish-message-body">
+                    <!-- Typing effect text goes here -->
+                </div>
+                
+                <button id="btn-go-memories" class="btn btn-accent btn-large d-none">
+                    Enter Memory Lane <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Step 6: Memories Gallery View -->
+        <section id="view-memories" class="view">
+            <div class="memories-header">
+                <h2>OUR CHERISHED MOMENTS</h2>
+                <p>A compilation of our sweetest picks, shared giggles, and beautiful stories.</p>
+                <div class="memories-line"></div>
+            </div>
+
+            <!-- Responsive grid layout optimized for Tablet (Samsung Tab) & Fallback Phone -->
+            <div class="memories-grid">
+                
+                <!-- Card 1 -->
+                <div class="memory-card glass-card" data-card-id="1">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory1.jpg" alt="First Memory" class="memory-img">
+                            <span class="memory-tag">The Beginning 📍</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Where It All Started</h3>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="memory-card glass-card" data-card-id="2">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory2.jpg" alt="Second Memory" class="memory-img">
+                            <span class="memory-tag">Shared Giggles ☕</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Late Night Conversations</h3>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="memory-card glass-card" data-card-id="3">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory3.jpg" alt="Third Memory" class="memory-img">
+                            <span class="memory-tag">Adventures 🎒</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Escapes &amp; Wanderlust</h3>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="memory-card glass-card" data-card-id="4">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory4.jpg" alt="Fourth Memory" class="memory-img">
+                            <span class="memory-tag">Cozy Times 🍿</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Comfort &amp; Warmth</h3>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="memory-card glass-card" data-card-id="5">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory5.jpg" alt="Memory Five" class="memory-img">
+                            <span class="memory-tag">Your Tag Here</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Your Title Here</h3>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                 <div class="memory-card glass-card" data-card-id="6">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory6.jpg" alt="Memory Six" class="memory-img">
+                            <span class="memory-tag">Your Tag Here</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Your Title Here</h3>
+                    </div>
+                </div>
+
+                <!-- Card 7 -->
+                 <div class="memory-card glass-card" data-card-id="7">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory7.jpg" alt="Memory Seven" class="memory-img">
+                            <span class="memory-tag">Your Tag Here</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Your Title Here</h3>
+                    </div>
+                </div>
+
+                <!-- Card 8 -->
+                 <div class="memory-card glass-card" data-card-id="8">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory8.jpg" alt="Memory Eight" class="memory-img">
+                            <span class="memory-tag">Your Tag Here</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Your Title Here</h3>
+                    </div>
+                </div>
+
+                <!-- Card 9 -->
+                 <div class="memory-card glass-card" data-card-id="9">
+                    <div class="memory-card-inner">
+                        <div class="memory-image-container">
+                            <img src="assets/memory9.jpg" alt="Memory Nine" class="memory-img">
+                            <span class="memory-tag">Your Tag Here</span>
+                        </div>
+                    </div>
+                    <div class="memory-info">
+                        <h3>Your Title Here</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7: Locked "Unsent" Letter Container at bottom of memories page -->
+            <div class="locked-letter-section text-center">
+                <div class="locked-letter-title">
+                    <i class="fa-solid fa-envelope-open-text pulse-pink"></i>
+                    <h3>A Confidential Final Note</h3>
+                    <p>Reserved strictly for her. Requires personal validation password.</p>
+                </div>
+                
+                <div class="envelope-trigger-wrapper">
+                    <!-- Interactive Wax-Sealed Envelope -->
+                    <div class="envelope-container" id="envelope-trigger">
+                        <div class="envelope-back"></div>
+                        <div class="envelope-paper-preview">
+                            <i class="fa-solid fa-lock envelope-lock-icon"></i>
+                        </div>
+                        <div class="envelope-front-left"></div>
+                        <div class="envelope-front-right"></div>
+                        <div class="envelope-bottom"></div>
+                        <div class="envelope-top-flap"></div>
+                        <div class="wax-seal" id="wax-seal">
+                            <div class="wax-seal-inner">❤</div>
+                        </div>
+                    </div>
+                    <p class="envelope-hint">Click the envelope to authenticate</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Memory Detail View {Full Screen}-->
+         <section id="view-memory-detail" class="view memory-detail-view">
+            <button id="btn-back-to-memories" class="btn btn-round detail-back-btn" title="Back to Gallery">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+
+            <div class="memory-detail-scroll">
+                <div class="memory-detail-card glass-card">
+                    <div class="memory-detail-image-container">
+                        <img id="memory-detail-img" src="" alt="Memory Detail" class="memory-detail-img">
+                        <span class="memory-tag" id="memory-detail-tag"></span>
+                    </div>
+
+                    <div class="memory-detail-body">
+                        <h2 id="memory-detail-title"></h2>
+                        <p class="memory-detail-desc" id="memory-detail-desc"></p>
+
+                        <div class="comment-section">
+                            <div class="comment-history" id="memory-detail-comments"></div>
+                            <form class="comment-form" id="memory-detail-comment-form">
+                                <input type="text" placeholder="write your memory..." required class="comment-input" id="memory-detail-comment-input">
+                                <button type="submit" class="comment-submit-btn">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Passcode Keypad Overlay View -->
+        <section id="view-keypad" class="view-overlay">
+            <div class="keypad-modal glass-card">
+                <div class="keypad-header text-center">
+                    <i class="fa-solid fa-lock pulse-pink keypad-lock"></i>
+                    <h3>IDENTITY CONFIRMATION</h3>
+                    <p>Input the secret 4-digit passcode only she knows (e.g. Birthday Date)</p>
+                </div>
+                
+                <div class="passcode-dots-container">
+                    <div class="passcode-dot"></div>
+                    <div class="passcode-dot"></div>
+                    <div class="passcode-dot"></div>
+                    <div class="passcode-dot"></div>
+                </div>
+                
+                <div class="keypad-grid">
+                    <button class="keypad-btn" data-val="1">1</button>
+                    <button class="keypad-btn" data-val="2">2</button>
+                    <button class="keypad-btn" data-val="3">3</button>
+                    <button class="keypad-btn" data-val="4">4</button>
+                    <button class="keypad-btn" data-val="5">5</button>
+                    <button class="keypad-btn" data-val="6">6</button>
+                    <button class="keypad-btn" data-val="7">7</button>
+                    <button class="keypad-btn" data-val="8">8</button>
+                    <button class="keypad-btn" data-val="9">9</button>
+                    <button class="keypad-btn btn-danger" id="keypad-clear"><i class="fa-solid fa-trash-can"></i></button>
+                    <button class="keypad-btn" data-val="0">0</button>
+                    <button class="keypad-btn btn-success" id="keypad-close"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                
+                <div id="keypad-feedback" class="keypad-feedback text-center"></div>
+            </div>
+        </section>
+
+        <!-- Unlocked "Unsent" Letter View -->
+        <section id="view-letter" class="view">
+            <div class="letter-background-decorations">
+                <div class="rose-petal petal-1"></div>
+                <div class="rose-petal petal-2"></div>
+                <div class="rose-petal petal-3"></div>
+            </div>
+            
+            <div class="letter-scroll-wrapper">
+                <button id="btn-close-letter" class="btn btn-round letter-close-btn" title="Back to Gallery">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                
+                <div class="letter-sheet">
+                    <div class="letter-header">
+                        <span class="letter-date">May 3, 2026</span>
+                        <h2 class="letter-salutation">To Someone Truly Indispensable,</h2>
+                    </div>
+                    
+                    <div class="letter-paragraphs">
+                        <p>There are letters that get drafted in our minds, thoughts that simmer in the quiet hours of midnight, and words that we rarely find the perfect courage to send. This is one of them—the letter unsent, locked behind security keys, waiting for this exact moment to breathe.</p>
+                        
+                        <p>Watching you traverse another year of life is an absolute honor. You approach the world with a blend of resilience and grace that inspires me in ways I don't tell you enough. In a world full of fleeting connections, yours remains an anchor, a constant source of light, and a reminder of what is genuinely good.</p>
+                        
+                        <p>May this year bring you closer to every silent dream you carry in your heart. May you feel deeply appreciated, not just today, but in every small, ordinary Tuesday that follows. You are worth celebrating, not just because it is your birthday, but because the universe is simply a warmer, brighter space with you in it.</p>
+                        
+                        <p>So, here is my promise: to stand by you in your moments of celebration, and to hold space for you when the storm gets noisy. Thank you for being exactly who you are, unapologetically.</p>
+                    </div>
+                    
+                    <div class="letter-footer">
+                        <p class="letter-sign-off">With all my fondness,</p>
+                        <p class="letter-signature">Your Constant Anchor</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Floating Quick-Settings Developer/Demo Panel Trigger (Bottom Right) -->
+        <div id="btn-toggle-demo" class="demo-trigger" title="Toggle Demo Panel">
+            <i class="fa-solid fa-sliders"></i>
+        </div>
+
+        <!-- Hidden Developer/Demo Panel -->
+        <div id="demo-panel" class="demo-panel glass-card">
+            <div class="demo-header">
+                <h3>DEMO CONTROL CENTER</h3>
+                <button id="demo-close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="demo-body">
+                <div class="demo-section">
+                    <h4>Navigation Shortcuts</h4>
+                    <div class="demo-shortcut-grid">
+                        <button class="btn btn-sm btn-secondary" onclick="appState.transitionTo('qr')">1. QR Entry</button>
+                        <button class="btn btn-sm btn-secondary" onclick="appState.transitionTo('matrix')">2. Matrix Fall</button>
+                        <button class="btn btn-sm btn-secondary" onclick="appState.transitionTo('countdown')">3. Countdown</button>
+                        <button class="btn btn-sm btn-secondary" onclick="appState.transitionTo('cake')">4. Cake Anim</button>
+                        <button class="btn btn-sm btn-secondary" onclick="appState.transitionTo('wish')">5. Wish Msg</button>
+                        <button class="btn btn-sm btn-secondary" onclick="appState.transitionTo('memories')">6. Gallery</button>
+                    </div>
+                </div>
+
+                <div class="demo-section">
+                    <h4>Countdown Override</h4>
+                    <div class="demo-timer-options">
+                        <button id="demo-trigger-normal" class="btn btn-sm btn-primary">Standard Time (May 3rd)</button>
+                        <button id="demo-trigger-immediate" class="btn btn-sm btn-accent">Trigger 10s Countdown Now</button>
+                    </div>
+                </div>
+                
+                <div class="demo-section">
+                    <h4>Custom Webhook URL</h4>
+                    <input type="text" id="demo-webhook-url" placeholder="Slack/Discord webhook URL" class="demo-input">
+                    <button id="demo-save-webhook" class="btn btn-sm btn-primary mt-2">Save Webhook</button>
+                </div>
+
+                <div class="demo-section">
+                    <h4>Security Passcode</h4>
+                    <div class="flex-row">
+                        <input type="text" id="demo-passcode-val" value="0503" class="demo-input w-50">
+                        <button id="demo-save-passcode" class="btn btn-sm btn-primary w-50 ml-2">Update Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast Notification system -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Libraries via CDN -->
+    <!-- canvas-confetti for celebrating candle blow out -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- html5-qrcode for QR decoding -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
+    <!-- Custom Application Javascript -->
+    <script src="app.js"></script>
+</body>
+</html>
